@@ -22,13 +22,13 @@ function createMap(earthquakes) {
 
   // Define a baseMaps object to hold our base layers
   var baseMaps = {
-    "Street Map": streetmap,
-    "Dark Map": darkmap
+    "Street Map": streetmap
+    //"Dark Map": darkmap
   };
 
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
-    Earthquakes: earthquakes
+    'Earthquakes': earthquakes
   };
 
   // Create our map, giving it the streetmap and earthquakes layers to display on load
@@ -36,7 +36,7 @@ function createMap(earthquakes) {
     center: [
       37.09, -95.71
     ],
-    zoom: 5,
+    zoom: 2,
     layers: [streetmap, earthquakes]
   });
 
@@ -86,27 +86,30 @@ function createMap(earthquakes) {
 function createMarkers(response) {
 
     // Pull the "stations" property off of response.data
-    var earthquake = response.features;
+    var earthquakes = response.features;
   
     // Initialize an array to hold bike markers
     var quakeMarkers = [];
   
     // Loop through the stations array
-    for (var index = 0; index < earthquake.length; index++) {
-      var earthquake = earthquake[index];
+    for (var index = 0; index < earthquakes.length; index++) {
+      var earthquake = earthquakes[index].properties;
+      var geometry = earthquakes[index].geometry;
   //circles? check leaflet version documentation
       // For each station, create a marker and bind a popup with the station's name
-      var quakeMarker = L.circle([coordinates.lat, coordinates.lon])
-        .bindPopup("<h3>" + earthquake.name + "<h3><h3>Severity: " + earthquake.capacity + "</h3>");
-  
+      var quakeMarker = L.marker([geometry.coordinates[1], geometry.coordinates[0]])
+        .bindPopup("<h3>" + earthquake.place + "<h3><h3>Severity: " + earthquake.mag + "</h3>");
+        // console.log(geometry.coordinates[0]);
+        // console.log(earthquake.name);
       // Add the marker to the bikeMarkers array
       quakeMarkers.push(quakeMarker);
     }
-  
+      console.log(quakeMarkers)
     // Create a layer group made from the bike markers array, pass it into the createMap function
-    createMap(L.layerGroup(bikeMarkers));
+    createMap(L.layerGroup(quakeMarkers));
+ 
   }
  //import json
 
-d3.json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_week.geojson', createMap);
+d3.json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_week.geojson', createMarkers);
   
